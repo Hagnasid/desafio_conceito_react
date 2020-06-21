@@ -5,43 +5,52 @@ import api from './services/api'
 import "./styles.css";
 
 function App() {
-  const [projects, setProjects] = useState([])
+  const [repositories, setRepositories] = useState([])
 
   useEffect(() => {
-    api.get('/projects').then((response) => {
-      setProjects(response.data)
+    api.get('/repositories').then((response) => {
+      setRepositories(response.data)
     })
   }, [])
 
   async function handleAddRepository() {
-    const response = await api.post('./projects', {
-      "title": `Novo projeto ${Date.now()}`,
-      "owner": "lindomar nascimento"
-    })
+    const newRepository = {
+      title: `Novo projeto ${Date.now()}`,
+      url:  "https://github.com/Hagnasid/Node-http",
+      techs: "node, typescript, css"
+    }
 
-    const project = response.data
+    const response = await api.post('/repositories' , newRepository)
+    console.log(response.status)
 
-    setProjects([...projects, project])
+    const addNewRepository = response.data
+
+    if (response.status === 200) {
+      setRepositories([...repositories, addNewRepository])
+      console.log(repositories)
+    }
   }
 
   async function handleRemoveRepository(id) {
-    await api.delete(`/projects/${id}`)
+    const response = await api.delete(`/repositories/${id}`)
 
-    const removeRepository = projects.filter((project) => project.id !== id)
+    if (response.status === 204) {
+      const newRepositories = repositories.filter((project) => project.id !== id)
+      setRepositories(newRepositories)
+    }
 
-    setProjects(removeRepository)
   }
 
   return (
     <div>
       <ul data-testid="repository-list">
-        {projects.map((project) => (
-          <li key={project.id}>
-              {project.title}
-              <button onClick={() => handleRemoveRepository(project.id)}>
-                Remover
+        {repositories.map((repository) => (
+          <li key={repository.id}>
+            {repository.title}
+            <button onClick={() => handleRemoveRepository(repository.id)}>
+              Remover
               </button>
-            </li>
+          </li>
         ))}
       </ul>
 
