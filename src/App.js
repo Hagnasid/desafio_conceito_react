@@ -21,7 +21,6 @@ function App() {
     }
 
     const response = await api.post('/repositories' , newRepository)
-    console.log(response.status)
 
     const addNewRepository = response.data
 
